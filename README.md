@@ -1,60 +1,124 @@
-<div align="center">
+# am-reverse
 
-# ⚡ AlightMotion Premium Activate
+Automated activation service for Alight Motion premium using magic links. This project provides a web interface and API to generate temporary emails, send activation links, verify them, and retrieve premium account details.
 
-**unofficial alight motion premium activator**
+## Features
 
-*reverse engineered — cli & web, no ads, no tracking*
+- **Web Interface**: Clean, responsive UI inspired by YandexCity design.
+- **API Endpoints**:
+  - `POST /api/send-link` - Send magic link to email
+  - `POST /api/verify-link` - Verify magic link and get premium details
+  - `GET /api/stats` - Get activation statistics
+  - `GET /api/email/generate` - Generate random temporary email with custom prefix `yaaaaanx`
+- **Automation**: Integrated with tempmail.yandez.my.id to generate disposable emails instantly.
+- **Documentation**: Interactive API docs available at `/docs` (via Swagger UI - to be implemented) or see code comments.
+- **Vercel Ready**: Includes `vercel.json` for easy deployment.
 
-**live:** [am.neonode.my.id](https://am.neonode.my.id)
+## API Documentation
 
-<img src="https://img.shields.io/badge/status-unofficial-orange" alt="">
-<img src="https://img.shields.io/badge/reverse--engineering-deep-red" alt="">
-<img src="https://img.shields.io/badge/node-18%2B-green" alt="">
-
-**team reverse — neo:** ansari • zenno
-
-</div>
-
-> ⚠️ **UNOFFICIAL — bukan alat resmi dari Alight Creative.**
-> Dibuat murni dari **reverse engineering mendalam** terhadap aplikasi Android Alight Motion: di-snip trafiknya, dibedah protokol Firebase Auth & endpoint `verifyPurchase`-nya, lalu di-reimplement jadi CLI + web. Kalau kelakuanmu kena ban, tanggung sendiri.
-
----
-
-## apa yang bisa dilakuin
-
-- **magic link login** — masuk pake email doang, tanpa password, tanpa akun google
-- **premium aktif otomatis** — langsung nempel ke akun setelah verifikasi
-- **auto refresh token** — aktivasi ulang kapan aja dari sesi tersimpan
-- **dual mode** — CLI buat yang mager, web UI buat yang mau tampilan
-- **stealth headers** — nyamar 100% sebagai app android asli (`x-android-package` + `x-android-cert`)
-
-## cara pakai
-
-### cli
+### Generate Temporary Email
 ```
-node am.js
+GET /api/email/generate
 ```
-| | |
-|---|---|
-| `1` | kirim magic link ke email |
-| `2` | paste link dari email → premium aktif |
-| `3` | aktivasi ulang dari sesi tersimpan |
-| `4` | lihat sesi tersimpan |
 
-### web
+**Response:**
+```json
+{
+  "success": true,
+  "email": "yaaaaanx@247chats.com",
+  "username": "yaaaaanx",
+  "domain": "247chats.com",
+  "source": "nexmail",
+  "generated_at": "2026-09-12T05:36:41.357Z"
+}
+```
+
+### Send Magic Link
+```
+POST /api/send-link
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Link sent successfully"
+}
+```
+
+### Verify Magic Link
+```
+POST /api/verify-link
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "magicLink": "https://example.com/oobCode=..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "email": "user@example.com",
+    "uid": "U12345678",
+    "orderId": "ORDER_98765",
+    "idToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+### Get Statistics
+```
+GET /api/stats
+```
+
+**Response:**
+```json
+{
+  "total": 1234,
+  "today": 56
+}
+```
+
+## Deployment
+
+### Vercel
+1. Install Vercel CLI: `npm i -g vercel`
+2. Login: `vercel login`
+3. Deploy: `vercel`
+
+### Local Development
+1. Install dependencies: `npm install`
+2. Start server: `node server.js`
+3. Visit http://localhost:3300
+
+## Usage Example (Automation)
+
 ```bash
-npm install
-node server.js
+# Generate a temporary email
+curl http://localhost:3300/api/email/generate
+
+# Use the email to send a link
+curl -X POST http://localhost:3300/api/send-link \
+  -H "Content-Type: application/json" \
+  -d '{"email":"yaaaaanx@247chats.com"}'
+
+# After checking the inbox (via tempmail service or API), verify the link
+# (You would need to fetch the link from the tempmail inbox first)
 ```
-buka `http://localhost:3300` — ikuti 3 langkah di layar.
 
----
+## Notes
+- This project is for educational purposes only.
+- Use at your own risk; we are not affiliated with Alight Motion or any tempmail service.
+- The automation endpoint uses the tempmail.yandez.my.id service to generate emails with the prefix `yaaaaanx`.
 
-<div align="center">
-
-**disclaimer** — ini riset independen. tidak berafiliasi dengan alight creative / google.
-semua merek dagang milik pemiliknya masing-masing. gunakan atas risiko sendiri.
-penyalahgunaan (akun orang lain, massal, komersial) bukan tanggung jawab pembuat.
-
-</div>
+## License
+MIT
