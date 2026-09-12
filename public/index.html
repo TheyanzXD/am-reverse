@@ -14,6 +14,9 @@
   --acc: #5ec269;
   --acc-dim: #2c4a30;
   --red: #e05252;
+  --blue: #5b8def;
+  --blue-dim: #1e2a40;
+  --glow: rgba(94,194,105,0.12);
 }
 * { margin: 0; padding: 0; box-sizing: border-box }
 body {
@@ -209,10 +212,83 @@ footer {
   font-weight: 600;
   color: var(--acc);
 }
+/* AUTO section */
+.auto-panel {
+  background: var(--panel);
+  border: 2px solid var(--acc);
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.auto-panel h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--acc);
+}
+.auto-panel p {
+  color: var(--dim);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+.auto-btn {
+  background: linear-gradient(135deg, var(--acc), #45a850);
+  color: #06130a;
+  border: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 36px;
+  cursor: pointer;
+  border-radius: 6px;
+  letter-spacing: .03em;
+  transition: all .2s;
+  box-shadow: 0 0 20px var(--glow);
+}
+.auto-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px var(--glow);
+}
+.auto-btn:disabled { opacity: .5; cursor: wait }
+/* Auto progress */
+.auto-progress { margin-top: 20px; text-align: left; }
+.auto-progress .log {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 12px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+.auto-progress .log .entry {
+  padding: 3px 0;
+  color: var(--dim);
+}
+.auto-progress .log .entry .step {
+  color: var(--acc);
+  font-weight: 600;
+}
+.auto-progress .log .entry .step.err {
+  color: var(--red);
+}
+.auto-progress .spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--dim);
+  border-top-color: var(--acc);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg) } }
 /* Responsive */
 @media (max-width: 600px) {
   .stats { flex-direction: column; }
   .features { grid-template-columns: 1fr; }
+  .auto-panel { padding: 20px; }
 }
 </style>
 </head>
@@ -225,7 +301,7 @@ footer {
 
 <div class="hero">
   <h2>What is this?</h2>
-  <p>Automated activation service for Alight Motion premium using magic links. Generate temporary emails, receive verification links, and activate premium accounts seamlessly.</p>
+  <p>Automated activation service for Alight Motion premium using magic links. One-click auto mode or manual flow — your choice.</p>
 </div>
 
 <div class="stats">
@@ -239,6 +315,38 @@ footer {
   </div>
 </div>
 
+<!-- AUTO MODE -->
+<div class="auto-panel">
+  <h2>&#9889; Auto Premium</h2>
+  <p>Generate temp email → kirim link → ambil dari inbox → verifikasi → premium aktif.<br>Satu klik, tanpa perlu API.</p>
+  <button class="auto-btn" id="autoBtn">&#9654; Jalankan Otomatis</button>
+  <div class="auto-progress hide" id="autoProg">
+    <div class="log" id="autoLog"></div>
+  </div>
+</div>
+
+<!-- AUTO RESULT -->
+<div class="panel hide" id="autoResult">
+  <h2 style="color:var(--acc)">premium aktif</h2>
+  <p class="hint">detail akun di bawah, token bisa dicopy.</p>
+  <div class="kv"><b>email</b><span id="ar-em">-</span></div>
+  <div class="kv"><b>uid</b><span id="ar-uid">-</span></div>
+  <div class="kv"><b>order</b><span id="ar-ord">-</span></div>
+  <div class="kv"><b>valid until</b><span id="ar-until">-</span></div>
+  <div style="margin-top:12px">
+    <label>id token</label>
+    <div class="tok" id="ar-tok">-</div>
+    <button class="tiny sec" id="ar-copy">copy token</button>
+    <button class="tiny sec" id="ar-again">jalankan lagi</button>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div style="margin:30px 0;border-top:1px solid var(--line);padding-top:20px">
+  <p style="color:var(--dim);font-size:14px;margin-bottom:16px">atau gunakan <b style="color:var(--txt)">mode manual</b> — masukkan email & link sendiri:</p>
+</div>
+
+<!-- MANUAL MODE -->
 <div class="steps">
   <div id="n1" class="on">01 email</div>
   <div id="n2">02 link</div>
@@ -280,16 +388,16 @@ footer {
 
 <div class="features">
   <div class="feature">
-    <h3>Automation Ready</h3>
-    <p>Generate random emails with custom prefix via <code>/api/email/generate</code> endpoint.</p>
+    <h3>One-Click Auto</h3>
+    <p>Tombol otomatis: generate temp email, kirim link, ambil dari inbox, verifikasi &mdash; selesai.</p>
   </div>
   <div class="feature">
-    <h3>API Documentation</h3>
-    <p>Access interactive docs at <code>/docs</code> for all available endpoints.</p>
+    <h3>Manual Mode</h3>
+    <p>Masukkan email & link sendiri kalau ingin kendali penuh. Langkah demi langkah.</p>
   </div>
   <div class="feature">
     <h3>Secure & Private</h3>
-    <p>All communications are encrypted. No data stored permanently.</p>
+    <p>Temp mail langsung dihapus. Tidak ada data yang disimpan permanen.</p>
   </div>
 </div>
 
@@ -299,11 +407,13 @@ footer {
 <script>
 const $ = i => document.getElementById(i)
 
+// Stats
 fetch('/api/stats').then(r => r.json()).then(j => {
   $('st-total').textContent = Number(j.total || 0).toLocaleString('id-ID')
   $('st-today').textContent = Number(j.today || 0).toLocaleString('id-ID')
 }).catch(() => {})
 
+// === MANUAL MODE ===
 const step = n => {
   for (let i = 1; i <= 3; i++) {
     $('p' + i).classList.toggle('hide', i !== n)
@@ -327,7 +437,7 @@ $('b1').onclick = async () => {
     if (j.success) { say('m1', 'link terkirim, cek email', 1); $('w-em').textContent = em; setTimeout(() => step(2), 700) }
     else say('m1', j.message || 'gagal', 0)
   } catch { say('m1', 'server gak nyambung', 0) }
-  busy(b, false); b.textContent = 'kirim link \\u2192'
+  busy(b, false); b.textContent = 'kirim link \u2192'
 }
 
 $('b2').onclick = () => step(1)
@@ -349,11 +459,84 @@ $('b3').onclick = async () => {
       step(3)
     } else say('m2', j.message || 'gagal', 0)
   } catch { say('m2', 'server gak nyambung', 0) }
-  busy(b, false); b.textContent = 'verifikasi \\u2192'
+  busy(b, false); b.textContent = 'verifikasi \u2192'
 }
 
 $('b4').onclick = () => { navigator.clipboard.writeText(window.__tok || ''); $('b4').textContent = 'copied' }
 $('b5').onclick = () => { $('lk').value = ''; step(1) }
+
+// === AUTO MODE ===
+const addLog = (step, msg, isErr) => {
+  const log = $('autoLog')
+  const entry = document.createElement('div')
+  entry.className = 'entry'
+  const icon = isErr ? '\u2718' : '\u2714'
+  entry.innerHTML = `<span class="step${isErr ? ' err' : ''}">${icon} ${step}</span> — ${msg}`
+  log.appendChild(entry)
+  log.scrollTop = log.scrollHeight
+}
+
+$('autoBtn').onclick = async () => {
+  const btn = $('autoBtn')
+  const prog = $('autoProg')
+  const log = $('autoLog')
+  const result = $('autoResult')
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span> berjalan...'
+  prog.classList.remove('hide')
+  result.classList.add('hide')
+  log.innerHTML = ''
+
+  addLog('init', 'memulai otomasi...')
+
+  try {
+    const r = await fetch('/api/auto', { method: 'POST', headers: {'content-type':'application/json'}, body: '{}' })
+    const j = await r.json()
+
+    // Show server logs
+    if (j.log) {
+      j.log.forEach(l => addLog(l.step, l.message, l.step === 'error'))
+    }
+
+    if (j.success) {
+      const d = j.data
+      $('ar-em').textContent = d.email
+      $('ar-uid').textContent = d.uid
+      $('ar-ord').textContent = d.orderId || '-'
+      $('ar-until').textContent = d.validUntil || '-'
+      $('ar-tok').textContent = d.idToken
+      window.__autoTok = d.idToken
+      result.classList.remove('hide')
+
+      // Refresh stats
+      fetch('/api/stats').then(r => r.json()).then(j => {
+        $('st-total').textContent = Number(j.total || 0).toLocaleString('id-ID')
+        $('st-today').textContent = Number(j.today || 0).toLocaleString('id-ID')
+      }).catch(() => {})
+
+      btn.innerHTML = '\u2714 selesai!'
+      btn.style.background = 'var(--acc)'
+    } else {
+      addLog('error', j.message || 'gagal', true)
+      btn.innerHTML = '\u2718 gagal — coba lagi'
+      btn.style.background = 'var(--red)'
+    }
+  } catch (e) {
+    addLog('error', 'server gak nyambung', true)
+    btn.innerHTML = '\u2718 error'
+    btn.style.background = 'var(--red)'
+  }
+
+  btn.disabled = false
+  setTimeout(() => {
+    btn.innerHTML = '\u25B6 Jalankan Otomatis'
+    btn.style.background = ''
+  }, 3000)
+}
+
+$('ar-copy').onclick = () => { navigator.clipboard.writeText(window.__autoTok || ''); $('ar-copy').textContent = 'copied' }
+$('ar-again').onclick = () => { $('autoResult').classList.add('hide'); $('autoLog').innerHTML = ''; $('autoProg').classList.add('hide') }
 </script>
 </body>
 </html>

@@ -4,33 +4,55 @@ Automated activation service for Alight Motion premium using magic links. This p
 
 ## Features
 
-- **Web Interface**: Clean, responsive UI inspired by YandexCity design.
+- **One-Click Auto Premium**: Generate temp email → send link → poll inbox → verify → activate. No API needed, just click.
+- **Manual Mode**: Step-by-step flow for users who want control.
 - **API Endpoints**:
+  - `POST /api/auto` - **One-click full automation** (recommended)
   - `POST /api/send-link` - Send magic link to email
   - `POST /api/verify-link` - Verify magic link and get premium details
   - `GET /api/stats` - Get activation statistics
-  - `GET /api/email/generate` - Generate random temporary email with custom prefix `yaaaaanx`
-- **Automation**: Integrated with tempmail.yandez.my.id to generate disposable emails instantly.
-- **Documentation**: Interactive API docs available at `/docs` (via Swagger UI - to be implemented) or see code comments.
+  - `GET /api/email/generate` - Generate random temporary email
+- **Temp Mail Integration**: Integrated with tempmail.yandez.my.id for disposable emails.
 - **Vercel Ready**: Includes `vercel.json` for easy deployment.
 
 ## API Documentation
 
-### Generate Temporary Email
+### One-Click Auto Premium ⚡
 ```
-GET /api/email/generate
+POST /api/auto
+Content-Type: application/json
+
+{}
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "email": "yaaaaanx@247chats.com",
-  "username": "yaaaaanx",
-  "domain": "247chats.com",
-  "source": "nexmail",
-  "generated_at": "2026-09-12T05:36:41.357Z"
+  "message": "premium aktif untuk neo-abc123@247chats.com",
+  "data": {
+    "email": "neo-abc123@247chats.com",
+    "uid": "U12345678",
+    "orderId": "neo-a1b2c3d4e5f6",
+    "status": "ACTIVE",
+    "idToken": "eyJhbG...VCJ9...",
+    "validUntil": "13 September 2027"
+  },
+  "log": [
+    { "step": "init", "message": "mengambil domain..." },
+    { "step": "email", "message": "email dibuat: neo-abc123@247chats.com" },
+    { "step": "link", "message": "link terkirim, menunggu inbox..." },
+    { "step": "poll", "message": "link diterima di inbox" },
+    { "step": "verify", "message": "verifikasi berhasil" },
+    { "step": "premium", "message": "mengaktifkan premium..." },
+    { "step": "done", "message": "premium aktif!" }
+  ]
 }
+```
+
+### Generate Temporary Email
+```
+GET /api/email/generate
 ```
 
 ### Send Magic Link
@@ -38,17 +60,7 @@ GET /api/email/generate
 POST /api/send-link
 Content-Type: application/json
 
-{
-  "email": "user@example.com"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Link sent successfully"
-}
+{ "email": "user@example.com" }
 ```
 
 ### Verify Magic Link
@@ -56,36 +68,12 @@ Content-Type: application/json
 POST /api/verify-link
 Content-Type: application/json
 
-{
-  "email": "user@example.com",
-  "magicLink": "https://example.com/oobCode=..."
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "email": "user@example.com",
-    "uid": "U12345678",
-    "orderId": "ORDER_98765",
-    "idToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
+{ "email": "user@example.com", "magicLink": "https://example.com/oobCode=..." }
 ```
 
 ### Get Statistics
 ```
 GET /api/stats
-```
-
-**Response:**
-```json
-{
-  "total": 1234,
-  "today": 56
-}
 ```
 
 ## Deployment
@@ -100,25 +88,10 @@ GET /api/stats
 2. Start server: `node server.js`
 3. Visit http://localhost:3300
 
-## Usage Example (Automation)
-
-```bash
-# Generate a temporary email
-curl http://localhost:3300/api/email/generate
-
-# Use the email to send a link
-curl -X POST http://localhost:3300/api/send-link \
-  -H "Content-Type: application/json" \
-  -d '{"email":"yaaaaanx@247chats.com"}'
-
-# After checking the inbox (via tempmail service or API), verify the link
-# (You would need to fetch the link from the tempmail inbox first)
-```
-
 ## Notes
 - This project is for educational purposes only.
 - Use at your own risk; we are not affiliated with Alight Motion or any tempmail service.
-- The automation endpoint uses the tempmail.yandez.my.id service to generate emails with the prefix `yaaaaanx`.
+- The auto endpoint generates random temp emails, polls inbox up to 90 seconds, and activates premium automatically.
 
 ## License
 MIT
